@@ -1,6 +1,6 @@
 # Clustering under Small Samples — 小样本条件下的聚类有效性分析
 
-##At a Glance
+## At a Glance
 
 | 关键事实 | 数值 |
 | --- | --- |
@@ -66,7 +66,7 @@ Main finding: **all clustering methods achieve ARI below 0.35**, so unsupervised
 | 类别数 | 6（`adi/car/mas/gla/fad/con`） |
 | 特点 | 多频率阻抗测量 |
 
-> 说明：UCI 原始文件（`BreastTissue.xls`）含一列顺序编号 `Case #`，本仓库的 `data.csv` **已剔除该编号列**，避免其被误当作数值特征参与标准化与 PCA。
+> 说明： 原始文件（`BreastTissue.xls`）含一列顺序编号 `Case #`，本仓库的 `data.csv` **已剔除该编号列**，避免其被误当作数值特征参与标准化与 PCA。
 
 ### 采集信息
 
@@ -148,40 +148,32 @@ python breast_tissue_analysis.py
 ## 4. 图表说明 / Figure Descriptions
 
 ### 4.1 `eda_class_count.png` — 各类样本计数
-
 柱状图展示 6 个类别（car / fad / mas / gla / con / adi）的样本数量。各类约在 14–22 之间（adi≈22 最高，con≈14 最低），**整体相对均衡、无极端类别不平衡**；但总量仅百条级，是典型小样本场景。
-![eda_class_count.png](https://docimg1.docs.qq.com/image/AgAABh3UEX9GA3Mk925ABamnX2BuBoGI.png?w=1486&h=735)
+![eda_class_count.png](figures/eda_class_count.png)
 ### 4.2 `eda_corr_heatmap.png` — 特征相关性热力图
-
 9 个数值特征两两间的皮尔逊相关系数矩阵。可以看到 **I0 与 P 高度相关（r≈0.99）**、**DA 与 DR 高度相关（r≈0.97）**、Max.IP 与 P（≈0.86）、I0 与 DA/Max.IP（≈0.82）等多组强正相关，说明**多数阻抗特征信息冗余**；而 **PA500 与多数特征弱相关甚至负相关（如与 I0 ≈ -0.39），相对独立**。这解释了为什么 PCA 降维是合理选择。
-![eda_corr_heatmap.png](https://docimg10.docs.qq.com/image/AgAABh3UEX_snKMZGsNLEaO4tsphY1Mi.png?w=1384&h=1185)
+![eda_corr_heatmap.png](figures/eda_corr_heatmap.png)
 ### 4.3 `eda_kde_all_features.png` — 9 个特征的 KDE 分布
-
 3×3 子图，展示每个特征下 6 类样本的核密度曲线。**多数特征上各类别密度曲线高度重叠**，仅 Area、P 等少数特征存在峰位或宽度差异。**单特征难以清晰区分 6 类组织**，为后续聚类效果受限埋下伏笔。
-![eda_kde_all_features.png](https://docimg4.docs.qq.com/image/AgAABh3UEX9VNoWviV9PdJx-0suThoWd.png?w=2388&h=1485)
+![eda_kde_all_features.png](figures/eda_kde_all_features.png)
 ### 4.4 `gap_stat.png` — Gap Statistic 选 K 曲线
-
 横轴 k（1–9），纵轴 Gap 值，带误差棒。曲线**随 k 增大整体持续上升、无明显满足“1-SE 规则”的拐点**，说明小样本下 Gap Statistic 给不出清晰唯一的 K 建议，必须结合其他指标共同判断。
-![gap_stat.png](https://docimg3.docs.qq.com/image/AgAABh3UEX_rR6fhawFFM5xXuhBADlKJ.png?w=1186&h=585)
+![gap_stat.png](figures/gap_stat.png)
 ### 4.5 `k_metric_curve.png` — Silhouette / ARI vs K
-
 左右子图，横轴 k（2–8）：
-
 - **Silhouette 在 k=2 时最高（≈0.49）**，随后下降、在 k=5、6 小幅回升，再降；
 - **ARI 在 k=4 时达到峰值（≈0.293）**，之后波动下降。
-
 两张图方向不一致，说明**“内部结构更紧凑（偏小的 k）”并不等于“更接近真实标签”**——小样本下仅凭内部指标选 K 不可靠。
-![k_metric_curve.png](https://docimg6.docs.qq.com/image/AgAABh3UEX_lJXrwFeFKv42XHwiPubEn.png?w=1487&h=585)
+![k_metric_curve.png](figures/k_metric_curve.png)
 ### 4.6 `k_distance.png` — K-Distance 图（DBSCAN 选 eps）
-
 按第 7 近邻距离排序的样本曲线。前期平缓，在序列尾部出现急剧陡升，据此 eps 的合理区间约为 0.9–1.2；代码权衡簇数与噪声数量后采用 **eps=1.1、min_samples=7**。
-![k_distance.png](https://docimg9.docs.qq.com/image/AgAABh3UEX9shytA669Lur4vy2w4_cf1.png?w=1186&h=585)
+![k_distance.png](figures/k_distance.png)
 ### 4.7 `cluster_kmeans_dbscan_compare.png` — K-Means 与 DBSCAN 对比（PCA 二维投影）
 
 - **K-Means** 将样本强制划分为 4 个较紧凑的簇；
 - **DBSCAN** 将绝大多数样本判为同一个密度连通簇，43 个点判为噪声，几乎无法形成有意义的多簇结构。
 差异直观说明：**该数据不存在清晰分离的密度结构，DBSCAN 的密度假设在此失效**。
-![cluster_kmeans_dbscan_compare.png](https://docimg1.docs.qq.com/image/AgAABh3UEX8sUz_KHAdJXKRhW3DgRLTY.png?w=2086&h=885)
+![cluster_kmeans_dbscan_compare.png](figures/cluster_kmeans_dbscan_compare.png)
 ---
 
 ## 5. 主要结论 / Key Findings
