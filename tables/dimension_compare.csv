@@ -1,0 +1,4 @@
+﻿setting,mean_acc,std_acc
+PCA‑2,0.6057,0.0909
+PCA‑5,0.7124,0.0624
+Full‑Feature,0.7162,0.0706
